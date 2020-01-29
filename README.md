@@ -1,30 +1,22 @@
-# ros-kinetic-nvidia-docker
-Extends the `osrf/ros:kinetic-desktop-full` image by adding opengl, glvnd and
-cuda 8.0. This makes opengl work from any docker environment when used with
-[nvidia-docker2](https://github.com/NVIDIA/nvidia-docker). Thanks to
-[phromo](https://github.com/phromo/ros-indigo-desktop-full-nvidia) for the
-baseline. Note that this is currently supported for Linux systems only.
+# ros-kinetic-nvidia-docker - turtlebot3 branch
+Extends ros-kinetic-nvidia-docker to make it easy to get up and running with turtlebot3.
 
-To extend the Dockerfile (e.g. to add more ROS packages or users), take a
-look at the commented out lines at the end of file.
+As it stands, the users home directory is shared with the container (which may not be necessary).
+
+Any files in the catkin_ws_src folder are shared with the container at /kinetic_catkin_ws/src.
 
 # Installation
-1. Install docker
-2. Install nvidia-docker using instructions
-[here](https://github.com/NVIDIA/nvidia-docker).
-3. After cloning this repo, run
-`sudo docker build -t <image_name> ros-kinetic-nvidia-docker/`
-4. Run the following commands to give docker permission to run on X:
-```bash
-xhost +local:docker
-XSOCK=/tmp/.X11-unix
-XAUTH=/tmp/.docker.xauth
-sudo touch $XAUTH
-xauth nlist $DISPLAY | sed -e 's/^..../ffff/' | sudo xauth -f $XAUTH nmerge -
+1. Install docker.
+2. Add user to docker group (see https://docs.docker.com/install/linux/linux-postinstall/)
+3. Install [nvidia-docker](https://github.com/NVIDIA/nvidia-docker).
+4. Run `sh build-image.sh` to build the image.
+5. Run `sh new-container.sh` to create and enter a new container.
+6. To join an existing container from another terminal, use `sh attach-to-container.sh`.
+7. You will probably want to add lines resembling those in `example_bashrc` to your bashrc (until we remove sharing of the home directory).
+
+# Use
+Once inside the container (at `/kinetic_catkin_ws'), run `catkin_make` to build the turtlebot packages, and `source devel/setup.bash`. To test out the installation, run
 ```
-5. Start the container:
-```bash
-sudo nvidia-docker run -it --volume=$XSOCK:$XSOCK:rw
---volume=$XAUTH:$XAUTH:rw --env="XAUTHORITY=${XAUTH}"
---env="DISPLAY" <image_name>
+roslaunch turtlebot3_fake turtlebot3_fake.launch
 ```
+and you should see an Rviz window with the turtlebot3 come up.
