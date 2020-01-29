@@ -1,5 +1,12 @@
 FROM osrf/ros:kinetic-desktop-full
 
+# Arguments
+ARG user
+ARG uid
+ARG home
+ARG workspace
+ARG shell
+
 RUN rm -rf /var/lib/apt/lists/*
 
 ENV NVIDIA_VISIBLE_DEVICES=all \
@@ -116,6 +123,18 @@ RUN echo "deb http://packages.ros.org/ros/ubuntu $(lsb_release -sc) main" > /etc
 #RUN apt-get update && apt-get install -y \
 #        ros-kinetic-xxx
 #    rm -rf /var/lib/apt/lists/*
+# see http://emanual.robotis.com/docs/en/platform/turtlebot3/pc_setup/ for list
+RUN apt-get update && apt-get install -y \
+    ros-kinetic-joy ros-kinetic-teleop-twist-joy ros-kinetic-teleop-twist-keyboard ros-kinetic-laser-proc \
+    ros-kinetic-rgbd-launch ros-kinetic-depthimage-to-laserscan ros-kinetic-rosserial-arduino \
+    ros-kinetic-rosserial-python ros-kinetic-rosserial-server ros-kinetic-rosserial-client \
+    ros-kinetic-rosserial-msgs ros-kinetic-amcl ros-kinetic-map-server ros-kinetic-move-base ros-kinetic-urdf \
+    ros-kinetic-xacro ros-kinetic-compressed-image-transport ros-kinetic-rqt-image-view ros-kinetic-gmapping \
+    ros-kinetic-navigation ros-kinetic-interactive-markers
+# RUN apt-get update && apt-get install -y \
+#     ros-kinetic-turtlebot3-bringup ros-kinetic-turtlebot3-description ros-kinetic-turtlebot3-example \
+#     ros-kinetic-turtlebot3-navigation ros-kinetic-turtlebot3-slam ros-kinetic-turtlebot3-teleop \
+#     ros-kinetic-turtlebot3-msgs ros-kinetic-turtlebot3-gazebo
 
 # Add new sudo user
 #ENV USERNAME=username
@@ -131,3 +150,29 @@ RUN echo "deb http://packages.ros.org/ros/ubuntu $(lsb_release -sc) main" > /etc
 # Uncomment to change default user and working directory
 #USER rosmaster
 #WORKDIR /home/rosmaster/
+
+# basic utilities
+RUN apt-get install -y zsh curl screen tree sudo ssh synaptic vim
+
+# set up users and directories
+VOLUME "${home}"
+VOLUME "/media"
+
+# Clone user into docker image and set up X11 sharing
+RUN mkdir -p /etc/sudoers.d
+RUN \
+  echo "${user}:x:${uid}:${uid}:${user},,,:${home}:${shell}" >> /etc/passwd && \
+  echo "${user}:x:${uid}:" >> /etc/group && \
+  echo "${user} ALL=(ALL) NOPASSWD: ALL" > "/etc/sudoers.d/${user}" && \
+  chmod 0440 "/etc/sudoers.d/${user}"
+
+# Switch to user
+RUN mkdir -p /kinetic_catkin_ws/src
+RUN chown ${user}:${user} /kinetic_catkin_ws
+RUN chown ${user}:${user} /kinetic_catkin_ws/src
+USER "${user}"
+# This is required for sharing Xauthority
+ENV QT_X11_NO_MITSHM=1
+ENV CATKIN_TOPLEVEL_WS="${workspace}/devel"
+# Switch to the workspace
+WORKDIR ${workspace}
