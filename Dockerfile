@@ -152,7 +152,13 @@ RUN apt-get update && apt-get install -y \
 #WORKDIR /home/rosmaster/
 
 # basic utilities
-RUN apt-get install -y zsh curl screen tree sudo ssh synaptic vim
+RUN apt-get install -y zsh curl screen tree sudo ssh synaptic vim net-tools
+
+# python tools
+RUN wget https://bootstrap.pypa.io/get-pip.py
+RUN python get-pip.py
+RUN pip install --upgrade pip
+RUN pip install ipython
 
 # set up users and directories
 VOLUME "${home}"

@@ -3,7 +3,7 @@ Extends ros-kinetic-nvidia-docker to make it easy to get up and running with tur
 
 As it stands, the users home directory is shared with the container (which may not be necessary).
 
-Any files in the catkin_ws_src folder are shared with the container at /kinetic_catkin_ws/src.
+Any files in the `catkin_ws_src` folder are shared with the container at `/kinetic_catkin_ws/src`.
 
 # Installation
 1. Install docker.
@@ -20,3 +20,5 @@ Once inside the container (at `/kinetic_catkin_ws'), run `catkin_make` to build 
 roslaunch turtlebot3_fake turtlebot3_fake.launch
 ```
 and you should see an Rviz window with the turtlebot3 come up.
+
+To add your own ros packages, either add them directly to the `catkin_ws_src` folder, or add a symlink to them in that folder.
