@@ -15,7 +15,7 @@ Any files in the `catkin_ws_src` folder are shared with the container at `/kinet
 7. You will probably want to add lines resembling those in `example_bashrc` to your bashrc (until we remove sharing of the home directory).
 
 # Use
-Once inside the container (at `/kinetic_catkin_ws'), run `catkin_make` to build the turtlebot packages, and `source devel/setup.bash`. To test out the installation, run
+Once inside the container (at `/kinetic_catkin_ws`), run `catkin_make` to build the turtlebot packages, and `source devel/setup.bash`. To test out the installation, run
 ```
 roslaunch turtlebot3_fake turtlebot3_fake.launch
 ```
