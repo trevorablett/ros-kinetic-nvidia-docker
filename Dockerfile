@@ -160,6 +160,9 @@ RUN python get-pip.py
 RUN pip install --upgrade pip
 RUN pip install ipython
 
+# for rob521 course
+RUN pip install scikit-image
+
 # set up users and directories
 VOLUME "${home}"
 VOLUME "/media"
